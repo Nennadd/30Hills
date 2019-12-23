@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Assignment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            background: #ccc;
+        }
+        img {
+            box-shadow: 3px 3px 10px #000;
+        }
+    </style>
+</head>
+<body>
+
+	<div class="container-fluid p-3">
+		<h1 class="text-center my-4 font-weight-bold">All Users</h1>
+
+        <div id="users" class="row">
+
+        </div>
+    </div>
+    
+	<script>
+        (async () => {
+            let {data} = await axios.get('data.json');
+            const usr = [];
+            for(const users of data){
+                usr.push(users);
+                const id = users.id;
+                const image = users.image;
+                const name = users.firstName;
+                const surname = users.surname;
+                const age = users.age;
+                const gender = users.gender;
+                
+                const friendIds = [];
+                const friendArray = [];
+
+                    // FRIENDS..
+                for(const ids of users.friends){            
+                    friendIds.push(ids);
+                }
+                for(friend of data){
+                    if(friendIds.includes(friend.id)){
+                        friendArray.push(`${friend.firstName} ${friend.surname}`);
+                    }
+                }
+                const friendNames = friendArray.join(', ');
+                
+
+                    // FRIENDS OF FRIENDS..
+                    let friendsOfFriendsIds = [];
+                    const friendsOfFriendsArray = [];
+
+                    for(const person of data){
+                        if(friendIds.includes(person.id)){
+                        console.log(person.friends);
+                        for(const friendsOf of data){
+                            if(person.friends.includes(friendsOf.id) && friendsOf.id != id)
+                            friendsOfFriendsArray.push(`${friendsOf.firstName} ${friendsOf.surname}`);
+                        }                      
+                    }       
+                }
+                const friendsOfFriendsNames = friendsOfFriendsArray.join(', ');
+
+
+                const div = document.querySelector("#users");
+                let card = document.createElement('div');
+                card.classList = 'card col-md-3 p-3 mb-2';
+
+                card.innerHTML = `
+                            <img class="mx-auto rounded" src="${ image }" width="70">
+                            <h3 class="mt-2 mb-0 text-center">${ name } ${ surname }</h3>
+                            <p class="mb-0 mt-1 text-center">Age: ${age} <span class="ml-3">Gender: ${ gender }</span></p>
+                            <hr>
+                            <h5 class="text-center">Friends: </h5>
+                            <p style="height: 50px;">${ friendNames }</p>
+                            <hr>
+                            <h5 class="text-center">Friends of friends: </h5>
+                            <p style="height:120px;">${ friendsOfFriendsNames }</p>
+                            <hr>
+                            <h5 class="text-center">Suggested friends: </h5>
+                        `;
+                div.append(card);
+            }
+            
+        })()
+    
+	</script>
+	
+</body>
+</html>
